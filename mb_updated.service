@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/mnt/bigd/moneybot/updated.py
+ExecStart=/usr/bin/python3 /mnt/bigd/moneybot/updated.py
 Restart=on-failure
 User=root
 WorkingDirectory=/mnt/bigd/moneybot
