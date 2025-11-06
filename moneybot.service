@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord MoneyBot
+After=network.target 
+
+[Service]
+Type=simple
+ExecStart=/mnt/drive/.cargo/bin/cargo run
+Restart=on-failure
+User=william
+WorkingDirectory=/mnt/bigd/moneybot
+EnvironmentFile=/etc/moneybot/env.conf
+
+[Install]
+WantedBy=multi-user.target

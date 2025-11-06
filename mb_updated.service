@@ -1,0 +1,13 @@
+[Unit]
+Description=MoneyBot Update Daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/mnt/bigd/moneybot/updated.py
+Restart=on-failure
+User=root
+WorkingDirectory=/mnt/bigd/moneybot
+
+[Install]
+WantedBy=multi-user.target
