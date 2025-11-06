@@ -7,7 +7,7 @@ def update(repo_path):
     repo = Repo(repo_path)
     repo.git.pull('origin', 'Main')
     subprocess.run(["cargo", "build"])
-    subprocess.run(["systemctl", "restart", "moneybot"])
+    subprocess.run(["sudo", "systemctl", "restart", "moneybot"])
 
 def monitor_updates(repo_path):
     repo = Repo(repo_path)
