@@ -5,6 +5,7 @@ use serenity::{Client, all::{Context, EventHandler, GatewayIntents, Message}, as
 mod bot_work;
 mod bot_check;
 mod bot_gamble;
+mod bot_top10;
 mod botdb;
 
 struct Handler;
@@ -54,6 +55,19 @@ impl EventHandler for Handler {
                     if let Err(why) = msg.reply_ping(&ctx.http, "Missing parameter amount").await {
                             println!("Error sending message: {why:?}");
                     }
+                }
+            } else if msg.content == "!top3" {
+                if let  Ok(str) = bot_top10::bot_top10(
+                    u64::from(msg.guild_id.expect("is_some was true, but there was no value")), &ctx
+                ).await {
+                    
+                    if let Err(why) = msg.reply_ping(&ctx.http, str.as_str()).await {
+                        println!("Error sending message: {why:?}");
+                    }
+                } else {
+                    if let Err(why) = msg.reply_ping(&ctx.http, "There was an error getting the top 3").await {
+                            println!("Error sending message: {why:?}");
+                    } 
                 }
             }
         }

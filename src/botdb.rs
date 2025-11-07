@@ -2,7 +2,6 @@ use rusqlite::{Connection, Result, params};
 use std::env;
 
 pub struct MoneyDatabase {
-    pub gid: u64,
     pub conn: Connection,
     pub tbl_name: String
 }
@@ -24,13 +23,14 @@ macro_rules! tblfmt  {
        format!($query, $self.tbl_name).as_str()
     }
 }
+pub(crate) use tblfmt;
 
 impl MoneyDatabase {
     pub fn open(gid: u64) -> Result<Self, MoneyError> {
         let home = env::var("HOME").expect("HOME Environemnt Variable must be set");
         let conn = Connection::open(format!("{home}/.moneybot/data.db"))?;
         let table_name = format!("guild_{gid}");
-        let db = MoneyDatabase { gid, conn, tbl_name: table_name};
+        let db = MoneyDatabase { conn, tbl_name: table_name};
         db.conn.execute(
             tblfmt!(db, "CREATE TABLE IF NOT EXISTS {} (
                 uid INTEGER PRIMARY KEY,
