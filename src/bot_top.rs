@@ -58,7 +58,7 @@ pub async fn bot_top(gid: u64, amnt: u32, ctx: &Context) -> Result<String, botdb
         }
     }
 
-    Ok((users.into_iter())
+    Ok((0..amnt as usize)
         .map(|i| {
             format!(
                 "{}. {} - ${}",
