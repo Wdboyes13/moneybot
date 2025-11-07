@@ -58,14 +58,13 @@ pub async fn bot_top(gid: u64, amnt: u32, ctx: &Context) -> Result<String, botdb
         }
     }
 
-    Ok((0..amnt as usize)
-        .map(|i| {
-            format!(
-                "{}. {} - ${}",
-                i + 1,
-                names.get(i as usize).unwrap_or(&"Unknown".to_string()),
-                balances.get(i as usize).unwrap_or(&0)
-            )
+    Ok((names.iter().enumerate())
+        .map(|(i, name)| {
+            if let Some(balance) = balances.get(i) {
+                format!("{}. {} - ${}", i + 1, name, balance)
+            } else {
+                String::new()
+            }
         })
         .collect::<Vec<String>>()
         .join("\n")
