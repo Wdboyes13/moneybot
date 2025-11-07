@@ -65,6 +65,7 @@ impl EventHandler for Handler {
                         println!("Error sending message: {why:?}");
                     }
                 } else {
+                    
                     if let Err(why) = msg.reply_ping(&ctx.http, "There was an error getting the top 3").await {
                             println!("Error sending message: {why:?}");
                     } 

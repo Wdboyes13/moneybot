@@ -34,7 +34,7 @@ pub fn get_top_users(gid: u64) -> Result<MoneyLeaderboard, botdb::MoneyError> {
 pub async fn bot_top10(gid: u64, ctx: &Context) -> Result<String, botdb::MoneyError> {
     
     let (users, balances, number) = {
-        let board = get_top_users(gid)?;
+        let board = get_top_users(gid).expect("Error getting top users");
         let users = board.users.iter().map(|&id| id as u64).collect::<Vec<u64>>();
         let balances = board.balances.clone();
         let number = board.number;
