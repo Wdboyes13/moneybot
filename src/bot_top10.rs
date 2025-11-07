@@ -1,19 +1,18 @@
 use crate::botdb;
 use std::vec::Vec;
+use rusqlite::params;
 use serenity::all::{Context, GuildId};
 
 pub struct MoneyLeaderboard {
-    pub number: u32,
     pub users: Vec::<u64>,
     pub balances: Vec::<u32>
 }
 
-pub fn get_top_users(gid: u64) -> Result<MoneyLeaderboard, botdb::MoneyError> {
+pub fn get_top_users(gid: u64, amnt: u32) -> Result<MoneyLeaderboard, botdb::MoneyError> {
     if let Ok(db) = botdb::MoneyDatabase::open(gid) {
-        let mut stmt = db.conn.prepare(botdb::tblfmt!(db, "SELECT uid, balance FROM {} ORDER BY balance DESC LIMIT 3"))?;
-        let mut rows = stmt.query([])?;
+        let mut stmt = db.conn.prepare(botdb::tblfmt!(db, "SELECT uid, balance FROM {} ORDER BY balance DESC LIMIT ?1"))?;
+        let mut rows = stmt.query(params![amnt])?;
         let mut board = MoneyLeaderboard {
-            number: 3,
             users: Vec::new(),
             balances: Vec::new(),
         };
@@ -33,22 +32,21 @@ pub fn get_top_users(gid: u64) -> Result<MoneyLeaderboard, botdb::MoneyError> {
 
 pub async fn bot_top10(gid: u64, ctx: &Context) -> Result<String, botdb::MoneyError> {
     
-    let (users, balances, number) = {
-        let board = get_top_users(gid)?;
+    let (users, balances) = {
+        let board = get_top_users(gid, 10)?;
         let users = board.users.iter().map(|&id| id as u64).collect::<Vec<u64>>();
         let balances = board.balances.clone();
-        let number = board.number;
-        (users, balances, number)
+        (users, balances)
     };
 
-    let user_ids: Vec<serenity::all::UserId> = users.into_iter()
+    let user_ids: Vec<serenity::all::UserId> = users.clone().into_iter()
         .map(serenity::all::UserId::from)
         .collect();
         
     let http = ctx.http.clone();
     let mut names = Vec::<String>::new();
 
-    for (_, uid) in user_ids.iter().take(number as usize).enumerate() {
+    for uid in user_ids.iter() {
         let id = *uid;
 
         match http.get_member(GuildId::from(gid), id).await {
@@ -60,7 +58,7 @@ pub async fn bot_top10(gid: u64, ctx: &Context) -> Result<String, botdb::MoneyEr
         }
     }
 
-    Ok((0..number)
+    Ok((users.into_iter())
         .map(|i| {
             format!(
                 "{}. {} - ${}",
