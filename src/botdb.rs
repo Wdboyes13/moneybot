@@ -34,10 +34,21 @@ impl MoneyDatabase {
         db.conn.execute(
             tblfmt!(db, "CREATE TABLE IF NOT EXISTS {} (
                 uid INTEGER PRIMARY KEY,
-                balance INTEGER NOT NULL
+                balance INTEGER NOT NULL,
+                last_modified DATETIME DEFAULT CURRENT_TIMESTAMP
             )"),
             [],
         )?;
+
+        db.conn.execute(
+              &format!("CREATE TRIGGER IF NOT EXISTS update_{}_timestamp
+                            AFTER UPDATE ON {}
+                            FOR EACH ROW
+                            BEGIN
+                                UPDATE {} SET last_modified = CURRENT_TIMESTAMP WHERE uid = NEW.uid;
+                            END", db.tbl_name, db.tbl_name, db.tbl_name
+                        ),
+        [])?;
         Ok(db)
     }
 
