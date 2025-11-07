@@ -30,10 +30,10 @@ pub fn get_top_users(gid: u64, amnt: u32) -> Result<MoneyLeaderboard, botdb::Mon
     }
 }
 
-pub async fn bot_top10(gid: u64, ctx: &Context) -> Result<String, botdb::MoneyError> {
+pub async fn bot_top(gid: u64, amnt: u32, ctx: &Context) -> Result<String, botdb::MoneyError> {
     
     let (users, balances) = {
-        let board = get_top_users(gid, 10)?;
+        let board = get_top_users(gid, amnt)?;
         let users = board.users.iter().map(|&id| id as u64).collect::<Vec<u64>>();
         let balances = board.balances.clone();
         (users, balances)

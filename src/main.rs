@@ -5,7 +5,7 @@ use serenity::{Client, all::{Context, EventHandler, GatewayIntents, Message}, as
 mod bot_work;
 mod bot_check;
 mod bot_gamble;
-mod bot_top10;
+mod bot_top;
 mod botdb;
 
 struct Handler;
@@ -35,8 +35,8 @@ impl EventHandler for Handler {
                 }
             } else if msg.content.starts_with("!gamble") {
                 println!("Received gamble command from {}", msg.author.display_name());
-                if let Some(amount) = msg.content.get(7..) {
-                    if let Ok(nmount) = amount.trim().parse::<u32>() {
+                if let Some(amount) = msg.content.get(7..) && 
+                   let Ok(nmount) = amount.trim().parse::<u32>()  {
                         let amnt = bot_gamble::bot_gamble(
                             u64::from(msg.guild_id.expect("is_some was true, but there was no value")), 
                             u64::from(msg.author.id),
@@ -46,29 +46,32 @@ impl EventHandler for Handler {
                         if let Err(why) = msg.reply_ping(&ctx.http, amnt).await {
                             println!("Error sending message: {why:?}");
                         }
-                    } else {
-                        if let Err(why) = msg.reply_ping(&ctx.http, "Missing parameter amount").await {
+                } else {
+                    if let Err(why) = msg.reply_ping(&ctx.http, "Missing parameter amount").await {
+                        println!("Error sending message: {why:?}");
+                    }
+                }
+            } else if msg.content.starts_with("!top") {
+                if let Some(amount) = msg.content.get(4..) && 
+                   let Ok(nmount) = amount.trim().parse::<u32>()
+                {
+                    if let  Ok(str) = bot_top::bot_top(
+                        u64::from(msg.guild_id.expect("is_some was true, but there was no value")), nmount, &ctx
+                    ).await {
+                        
+                        if let Err(why) = msg.reply_ping(&ctx.http, str.as_str()).await {
                             println!("Error sending message: {why:?}");
                         }
+                    } else {
+                        
+                        if let Err(why) = msg.reply_ping(&ctx.http, "There was an error getting the top 10").await {
+                            println!("Error sending message: {why:?}");
+                        } 
                     }
                 } else {
                     if let Err(why) = msg.reply_ping(&ctx.http, "Missing parameter amount").await {
-                            println!("Error sending message: {why:?}");
-                    }
-                }
-            } else if msg.content == "!top3" {
-                if let  Ok(str) = bot_top10::bot_top10(
-                    u64::from(msg.guild_id.expect("is_some was true, but there was no value")), &ctx
-                ).await {
-                    
-                    if let Err(why) = msg.reply_ping(&ctx.http, str.as_str()).await {
                         println!("Error sending message: {why:?}");
                     }
-                } else {
-                    
-                    if let Err(why) = msg.reply_ping(&ctx.http, "There was an error getting the top 3").await {
-                            println!("Error sending message: {why:?}");
-                    } 
                 }
             }
         }
