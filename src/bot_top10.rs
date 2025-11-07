@@ -4,7 +4,7 @@ use serenity::all::{Context, GuildId};
 
 pub struct MoneyLeaderboard {
     pub number: u32,
-    pub users: Vec::<u32>,
+    pub users: Vec::<u64>,
     pub balances: Vec::<u32>
 }
 
@@ -19,7 +19,7 @@ pub fn get_top_users(gid: u64) -> Result<MoneyLeaderboard, botdb::MoneyError> {
         };
         
         while let Some(row) = rows.next()? {
-            let uid: u32 = row.get(0)?;
+            let uid: u64 = row.get(0)?;
             let balance: u32 = row.get(1)?;
             board.users.push(uid);
             board.balances.push(balance);
@@ -34,7 +34,7 @@ pub fn get_top_users(gid: u64) -> Result<MoneyLeaderboard, botdb::MoneyError> {
 pub async fn bot_top10(gid: u64, ctx: &Context) -> Result<String, botdb::MoneyError> {
     
     let (users, balances, number) = {
-        let board = get_top_users(gid).expect("Error getting top users");
+        let board = get_top_users(gid)?;
         let users = board.users.iter().map(|&id| id as u64).collect::<Vec<u64>>();
         let balances = board.balances.clone();
         let number = board.number;
