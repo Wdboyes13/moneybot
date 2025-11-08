@@ -1,7 +1,9 @@
-use crate::botdb;
+use crate::library::botdb;
 use std::vec::Vec;
 use rusqlite::params;
 use serenity::all::{Context, GuildId};
+use crate::library::cmdutil;
+use poise::CreateReply;
 
 pub struct MoneyLeaderboard {
     pub users: Vec::<u64>,
@@ -71,3 +73,22 @@ pub async fn bot_top(gid: u64, amnt: u32, ctx: &Context) -> Result<String, botdb
     )
 }    
        
+
+#[poise::command(slash_command, prefix_command)]
+pub async fn top(
+    ctx: cmdutil::Context<'_>,
+    #[description = "Number of users to show"] count: Option<u32>,
+) -> Result<(), cmdutil::Error> {
+    let guild_id = ctx.guild_id().expect("Command used in guild").get();
+    let count = count.unwrap_or(10); // Default to top 10
+    
+    println!("Received top command from {}", ctx.author().name);
+    let result = bot_top(guild_id, count, ctx.serenity_context()).await?;
+    
+    ctx.send(CreateReply::default()
+        .content(result)
+        .reply(true)
+    ).await?;
+    
+    Ok(())
+}
