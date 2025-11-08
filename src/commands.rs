@@ -8,3 +8,4 @@ pub use bot_check::check;
 pub use bot_gamble::gamble;
 pub use bot_top::top;
 pub use bot_work::work;
+pub use bot_github::github;

@@ -16,7 +16,8 @@ async fn main() {
                     commands::work(), 
                     commands::check(), 
                     commands::gamble(), 
-                    commands::top()
+                    commands::top(),
+                    commands::github()
                 ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
