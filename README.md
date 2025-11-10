@@ -11,6 +11,7 @@ Commands are:
 - `!check` / `/check` - Returns current balance  
 - `!top <x>` / `/check <x>` - Returns leaderboard of top x in the server  
 - `!github` / `/github` - Returns github info about this bot  
+- `!transfer <User> <Amount>` / `/transfer <User> <Amount>` - Transfer Amount from you to User  
 
 ## Requirements  
 - Make sure `~/.moneybot` directory exists  
