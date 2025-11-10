@@ -18,3 +18,9 @@ Commands are:
 - Make sure we can create and modify `~/.moneybot/data.db`  
 - The environment variable `MONEYBOT_TOKEN` must be set to a valid discord bot token.  
 - SQLite3 system libraries are required for crate `rusqlite`  
+
+## License  
+
+Copyright (c) 2025 Wdboyes13  
+This program is licensed under the MIT License  
+SPDX-License-Identifier:MIT  
