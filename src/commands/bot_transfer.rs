@@ -3,13 +3,11 @@ use crate::library::cmdutil;
 use poise::CreateReply;
 
 pub async fn bot_transfer(gid: u64, from_uid: u64, to_uid: u64, amount: u32) -> Result<(), botdb::MoneyError> {
-    if let Ok(db) = botdb::MoneyDatabase::open(gid) {
+    cmdutil::safe_open_db!(gid, |db: botdb::MoneyDatabase| {
         db.delete_money(from_uid, amount)?;
         db.add_money(to_uid, amount)?;
-    } else {
-        panic!("ERROR: Unable to open SQLITE database, is ~/.moneybot a directory?");
-    }
-    Ok(())
+        Ok(())
+    })
 }
 
 #[poise::command(slash_command, prefix_command)]

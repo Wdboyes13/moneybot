@@ -5,26 +5,25 @@ use poise::CreateReply;
 
 cmdutil::sec_check!(gamble_check, 20);
 
-pub fn bot_gamble(gid: u64, uid: u64, amount: u32) -> String {
+pub async fn bot_gamble(gid: u64, uid: u64, amount: u32) -> Result<String, botdb::MoneyError> {
     let mut rng = rand::rng();
     let rand: u64 = rng.random_range(1..=100);
 
-    if let Ok(db) = botdb::MoneyDatabase::open(gid) {
+  
+    cmdutil::safe_open_db!(gid, |db: botdb::MoneyDatabase| {
         if let Err(err) = db.delete_money(uid, amount) {
-            return err.to_string();
+            return Err(err);
         }
         if rand > 55 {
             if let Ok(()) = db.add_money(uid, amount * 2) {
-                return format!("You won {}", amount * 2).to_string();
+                return Ok(format!("You won {}", amount * 2).to_string());
             } else {
-                return "There was an error".to_string();
+                return Ok("There was an error".to_string());
             }
         } else {
-            return format!("You lost {}", amount);
+            return Ok(format!("You lost {}", amount));
         }
-    } else {
-        panic!("ERROR: Unable to open SQLITE database, is ~/.moneybot a directory?");
-    }
+    })
 }
 
 #[poise::command(slash_command, prefix_command, check = gamble_check)]
@@ -36,12 +35,20 @@ pub async fn gamble(
     let user_id = ctx.author().id.get();
     
     println!("Received gamble command from {}", ctx.author().name);
-    let result = bot_gamble(guild_id, user_id, amount);
+    match bot_gamble(guild_id, user_id, amount).await {
+        Ok(result) => {
+            ctx.send(CreateReply::default()
+                .content(result)
+                .reply(true)
+            ).await?;
+        },
+
+        Err(err) => {
+            let _ = cmdutil::send_err!(ctx, err);
+        }
+    }
     
-    ctx.send(CreateReply::default()
-        .content(result)
-        .reply(true)
-    ).await?;
+    
     
     Ok(())
 }

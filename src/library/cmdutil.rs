@@ -44,3 +44,27 @@ macro_rules! sec_check {
 }
 
 pub(crate) use sec_check;
+
+
+macro_rules! send_err {
+    ($ctx:ident, $err:ident) => {
+        $ctx.send(CreateReply::default()
+            .content($err.to_string())
+            .reply(true)
+        ).await
+    }
+}
+
+pub(crate) use send_err;
+
+
+macro_rules! safe_open_db {
+    ($gid:ident, $dbops:expr) => {
+        match botdb::MoneyDatabase::open($gid) {
+            Ok(db) => $dbops(db),
+            Err(err) => return Err(err.into()),
+        }
+    }
+}
+
+pub(crate) use safe_open_db;

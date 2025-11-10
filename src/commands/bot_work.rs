@@ -5,18 +5,16 @@ use poise::CreateReply;
 
 cmdutil::sec_check!(work_check, 3);
 
-pub fn bot_work(gid: u64, uid: u64) -> u32 {
+pub fn bot_work(gid: u64, uid: u64) -> Result<u32, botdb::MoneyError> {
     let mut rng = rand::rng();
     let randint: u32 = rng.random_range(1..=1000);
-    if let Ok(db) = botdb::MoneyDatabase::open(gid) {
+    cmdutil::safe_open_db!(gid, |db: botdb::MoneyDatabase| {
         if let Err(why) = db.add_money(uid, randint) {
             println!("Error adding money: {why:?}");
-            return 0;
+            return Ok(0);
         }
-    } else {
-        panic!("ERROR: Unable to open SQLITE database, is ~/.moneybot a directory?");
-    }
-    randint
+        return Ok(randint);
+    })
 }
 
 #[poise::command(slash_command, prefix_command, check = work_check)]
@@ -27,12 +25,19 @@ pub async fn work(
     let user_id = ctx.author().id.get();
     
     println!("Received work command from {}", ctx.author().name);
-    let amount = bot_work(guild_id, user_id);
+    match bot_work(guild_id, user_id) {
+        Ok(amount) => {
+            ctx.send(CreateReply::default()
+                .content(format!("You earned ${}", amount))
+                .reply(true)
+            ).await?;
+        },
+
+        Err(err) => {
+            let _ = cmdutil::send_err!(ctx, err);
+        }
+    }
     
-    ctx.send(CreateReply::default()
-        .content(format!("You earned ${}", amount))
-        .reply(true)
-    ).await?;
     
     Ok(())
 }

@@ -11,25 +11,23 @@ pub struct MoneyLeaderboard {
 }
 
 pub fn get_top_users(gid: u64, amnt: u32) -> Result<MoneyLeaderboard, botdb::MoneyError> {
-    if let Ok(db) = botdb::MoneyDatabase::open(gid) {
+    cmdutil::safe_open_db!(gid, |db: botdb::MoneyDatabase| {
         let mut stmt = db.conn.prepare(botdb::tblfmt!(db, "SELECT uid, balance FROM {} ORDER BY balance DESC LIMIT ?1"))?;
         let mut rows = stmt.query(params![amnt])?;
         let mut board = MoneyLeaderboard {
             users: Vec::new(),
             balances: Vec::new(),
         };
-        
+            
         while let Some(row) = rows.next()? {
             let uid: u64 = row.get(0)?;
             let balance: u32 = row.get(1)?;
             board.users.push(uid);
             board.balances.push(balance);
         }
-        
-        Ok(board)
-    } else {
-        panic!("ERROR: Unable to open SQLITE database");
-    }
+            
+        return Ok(board)
+    })
 }
 
 pub async fn bot_top(gid: u64, amnt: u32, ctx: &Context) -> Result<String, botdb::MoneyError> {
