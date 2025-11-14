@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakePythonSetting">
+    <option name="pythonIntegrationState" value="YES" />
+  </component>
+  <component name="ZigToolchain" toolchain="be986434-10e7-4b95-9d9e-8a7a5cd8efec" />
+</project>
