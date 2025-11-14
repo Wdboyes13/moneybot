@@ -5,13 +5,7 @@ A discord bot for money-related things
 The official bot can be added to any server on discord  
 https://discord.com/oauth2/authorize?client_id=1436064615728676979  
 
-Commands are:  
-- `!work` / `/work` - Does work, gives random amount of money 1-1000 (Cooldown 3secs)  
-- `!gamble <amount>` / `/gamble <amount>` - Takes amount away, then if you win will give back double amount  
-- `!check` / `/check` - Returns current balance  
-- `!top <x>` / `/check <x>` - Returns leaderboard of top x in the server  
-- `!github` / `/github` - Returns github info about this bot  
-- `!transfer <User> <Amount>` / `/transfer <User> <Amount>` - Transfer Amount from you to User  
+Check the wiki for commands
 
 ## Requirements  
 - Make sure `~/.moneybot` directory exists  
