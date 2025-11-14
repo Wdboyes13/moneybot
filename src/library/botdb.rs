@@ -46,7 +46,8 @@ impl MoneyDatabase {
                 "CREATE TABLE IF NOT EXISTS {} (
                 uid INTEGER PRIMARY KEY,
                 balance INTEGER NOT NULL,
-                last_modified DATETIME DEFAULT CURRENT_TIMESTAMP
+                last_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
+                items VECTOR
             )"
             ),
             [],

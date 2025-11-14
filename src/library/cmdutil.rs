@@ -1,4 +1,8 @@
-use std::{collections::HashMap, sync::Arc, time::{Instant, Duration}};
+use std::{
+    collections::HashMap,
+    sync::Arc,
+    time::{Duration, Instant},
+};
 use tokio::sync::RwLock;
 
 pub struct Data {
@@ -25,7 +29,11 @@ pub async fn check_dr(ctx: Context<'_>, duration: Duration) -> Result<bool, Erro
 
     if let Some(last_used) = usage.get(&(user_id, command_name.clone())) {
         if now.duration_since(*last_used) < duration {
-            ctx.say(format!("⏳ Please wait {} seconds before using this command again", duration.as_secs())).await?;
+            ctx.say(format!(
+                "⏳ Please wait {} seconds before using this command again",
+                duration.as_secs()
+            ))
+            .await?;
             return Ok(false);
         }
     }
@@ -36,27 +44,24 @@ pub async fn check_dr(ctx: Context<'_>, duration: Duration) -> Result<bool, Erro
 
 macro_rules! sec_check {
     ($name:ident, $secs:literal) => {
-        async fn $name(ctx: crate::library::cmdutil::Context<'_>) 
-            -> Result<bool, crate::library::cmdutil::Error> {
-                crate::library::cmdutil::check_dr(ctx, std::time::Duration::from_secs( $secs )).await
+        async fn $name(
+            ctx: crate::library::cmdutil::Context<'_>,
+        ) -> Result<bool, crate::library::cmdutil::Error> {
+            crate::library::cmdutil::check_dr(ctx, std::time::Duration::from_secs($secs)).await
         }
     };
 }
 
 pub(crate) use sec_check;
 
-
 macro_rules! send_err {
     ($ctx:ident, $err:ident) => {
-        $ctx.send(CreateReply::default()
-            .content($err.to_string())
-            .reply(true)
-        ).await
-    }
+        $ctx.send(CreateReply::default().content($err.to_string()).reply(true))
+            .await
+    };
 }
 
 pub(crate) use send_err;
-
 
 macro_rules! safe_open_db {
     ($gid:ident, $dbops:expr) => {
@@ -64,7 +69,7 @@ macro_rules! safe_open_db {
             Ok(db) => $dbops(db),
             Err(err) => return Err(err.into()),
         }
-    }
+    };
 }
 
 pub(crate) use safe_open_db;
