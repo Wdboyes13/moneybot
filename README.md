@@ -4,6 +4,8 @@ A discord bot for money-related things
 ## Info  
 The official bot can be added to any server on discord  
 https://discord.com/oauth2/authorize?client_id=1436064615728676979  
+Official discord server  
+https://discord.gg/t6gBmnMYwK  
 
 Check the wiki for commands
 
