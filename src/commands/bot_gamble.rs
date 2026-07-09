@@ -14,7 +14,7 @@ pub async fn bot_gamble(gid: u64, uid: u64, amount: u32) -> Result<String, botdb
         if let Err(err) = db.delete_money(uid, amount) {
             return Err(err);
         }
-        if rand > 55 {
+        if rand > 48 {
             if let Ok(()) = db.add_money(uid, amount * 2) {
                 return Ok(format!("You won {}", amount * 2).to_string());
             } else {
